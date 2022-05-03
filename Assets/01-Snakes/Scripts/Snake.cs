@@ -4,29 +4,34 @@ using UnityEngine;
 public class Snake : MonoBehaviour
 {
     [SerializeField] private GameObject _snakeHead;
-    [SerializeField] public List<GameObject> _snake = new List<GameObject>();
+	[SerializeField] private GameObject _snakeBody;
+
+    private List<Transform> _snake = new List<Transform>();
 	private GameObject _bodyCopy = null;
-	private float _bodyPosition = 0.5f;
+	private Vector3 _bodyPosition;
 
 
 	private void Awake()
 	{
-		_snake.Add(_snakeHead);
-		GenerateBody(3);
+		_snake.Add(_snakeHead.transform);
+		_snake.Add(_snakeBody.transform);
 	}
 
-	public List<GameObject> SnakeBody { get { return _snake; } }
-
-	private void GenerateBody(int bodyCount)
+	public void MoveBody(Vector3 oldPosition)
 	{
-		for (int i = 0; i < bodyCount; i++)
+		for (int i = 1; i < _snake.Count; i++)
 		{
-			_bodyCopy = Instantiate(_snakeHead, new Vector3(_bodyPosition, 0, 0), Quaternion.identity);
-			_bodyCopy.transform.parent = transform;
-			_bodyCopy.name = "Body";
-			_snake.Add(_bodyCopy);
-
-			_bodyPosition += 0.5f;
+			(oldPosition, _snake[i].position) = (_snake[i].position, oldPosition);
 		}
+
+		_bodyPosition = oldPosition;
+	}
+
+	public void GenerateBody()
+	{
+		_bodyCopy = Instantiate(_snakeBody, _bodyPosition, Quaternion.identity);
+		_bodyCopy.transform.parent = transform;
+		_bodyCopy.name = "Body";
+		_snake.Add(_bodyCopy.transform);
 	}
 }
